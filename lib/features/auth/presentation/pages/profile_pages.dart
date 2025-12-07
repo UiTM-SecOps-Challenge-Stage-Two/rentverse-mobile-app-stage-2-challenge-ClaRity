@@ -6,6 +6,7 @@ import 'package:rentverse/features/auth/domain/usecase/logout_usecase.dart';
 import 'package:rentverse/common/bloc/auth/auth_cubit.dart';
 import 'package:rentverse/features/auth/presentation/cubit/profile/cubit.dart';
 import 'package:rentverse/features/auth/presentation/cubit/profile/state.dart';
+import 'package:rentverse/features/auth/presentation/screen/edit_profile_screen.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -70,10 +71,17 @@ class _ProfileView extends StatelessWidget {
                     const SizedBox(height: 20),
                     _ProfileMenuCard(
                       items: [
-                        const _ProfileMenuItem(
+                        _ProfileMenuItem(
                           icon: Icons.edit_outlined,
                           label: 'Edit Profile',
                           badgeCount: 3,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const EditProfileScreen(),
+                              ),
+                            );
+                          },
                         ),
                         const _ProfileMenuItem(
                           icon: Icons.star_outline,

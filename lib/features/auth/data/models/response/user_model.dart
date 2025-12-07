@@ -11,6 +11,8 @@ class UserModel extends UserEntity {
     required super.email,
     super.name,
     super.phone,
+    super.emailVerifiedAt,
+    super.phoneVerifiedAt,
     super.avatarUrl,
     required super.isVerified,
     super.createdAt,
@@ -39,6 +41,12 @@ class UserModel extends UserEntity {
       email: json['email'] as String? ?? '',
       name: json['name'] as String?,
       phone: json['phone'] as String?,
+      emailVerifiedAt: json['emailVerifiedAt'] != null
+          ? DateTime.tryParse(json['emailVerifiedAt'] as String)
+          : null,
+      phoneVerifiedAt: json['phoneVerifiedAt'] != null
+          ? DateTime.tryParse(json['phoneVerifiedAt'] as String)
+          : null,
       avatarUrl: json['avatarUrl'] as String?,
       isVerified: (json['isVerified'] as bool?) ?? false,
 
@@ -73,6 +81,8 @@ class UserModel extends UserEntity {
       'email': email,
       'name': name,
       'phone': phone,
+      'emailVerifiedAt': emailVerifiedAt?.toIso8601String(),
+      'phoneVerifiedAt': phoneVerifiedAt?.toIso8601String(),
       'avatarUrl': avatarUrl,
       'isVerified': isVerified,
       'createdAt': createdAt?.toIso8601String(),

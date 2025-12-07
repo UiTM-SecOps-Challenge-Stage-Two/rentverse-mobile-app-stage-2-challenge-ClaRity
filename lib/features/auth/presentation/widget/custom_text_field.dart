@@ -10,10 +10,12 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType keyboardType;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
   final bool readOnly;
   final VoidCallback? onTap;
   final String? initialValue; // Khusus untuk case seperti Role Picker
   final String? errorText; // Inline error below the field
+  final ValueChanged<String>? onChanged;
 
   const CustomTextField({
     super.key,
@@ -22,10 +24,12 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.suffixIcon,
+    this.prefixIcon,
     this.readOnly = false,
     this.onTap,
     this.initialValue,
     this.errorText,
+    this.onChanged,
   });
 
   @override
@@ -40,6 +44,7 @@ class CustomTextField extends StatelessWidget {
           keyboardType: keyboardType,
           readOnly: readOnly,
           onTap: onTap,
+          onChanged: onChanged,
           style: GoogleFonts.poppins(color: Colors.black87),
           decoration: InputDecoration(
             hintText: hintText,
@@ -52,6 +57,7 @@ class CustomTextField extends StatelessWidget {
               horizontal: 16,
               vertical: 14,
             ),
+            prefixIcon: prefixIcon,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey.shade300),

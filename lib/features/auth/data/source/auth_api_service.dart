@@ -2,6 +2,7 @@
 
 import 'package:rentverse/features/auth/data/models/request/login_request_model.dart';
 import 'package:rentverse/features/auth/data/models/request/register_request_model.dart';
+import 'package:rentverse/features/auth/data/models/request/update_profile_request_model.dart';
 import 'package:rentverse/features/auth/data/models/response/login_response_model.dart';
 import 'package:rentverse/features/auth/data/models/response/user_model.dart';
 
@@ -13,6 +14,9 @@ abstract class AuthApiService {
   Future<BaseResponseModel<LoginResponseModel>> login(LoginRequestModel body);
   Future<BaseResponseModel<UserModel>> register(RegisterRequestModel body);
   Future<BaseResponseModel<UserModel>> getProfile();
+  Future<BaseResponseModel<UserModel>> updateProfile(
+    UpdateProfileRequestModel body,
+  );
 }
 
 // 2. IMPLEMENTASI
@@ -65,6 +69,24 @@ class AuthApiServiceImpl implements AuthApiService {
   Future<BaseResponseModel<UserModel>> getProfile() async {
     try {
       final response = await _dioClient.get('/auth/me');
+      return BaseResponseModel.fromJson(
+        response.data,
+        (json) => UserModel.fromJson(json as Map<String, dynamic>),
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<BaseResponseModel<UserModel>> updateProfile(
+    UpdateProfileRequestModel body,
+  ) async {
+    try {
+      final response = await _dioClient.put(
+        '/auth/profile',
+        data: body.toJson(),
+      );
       return BaseResponseModel.fromJson(
         response.data,
         (json) => UserModel.fromJson(json as Map<String, dynamic>),

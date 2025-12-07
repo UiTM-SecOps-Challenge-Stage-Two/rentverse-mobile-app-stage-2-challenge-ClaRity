@@ -7,9 +7,11 @@ import '../../../../core/resources/data_state.dart';
 import '../../domain/entity/login_request_entity.dart';
 import '../../domain/entity/register_request_enity.dart';
 import '../../domain/entity/user_entity.dart';
+import '../../domain/entity/update_profile_request_entity.dart';
 import '../../domain/repository/auth_repository.dart';
 import '../models/request/login_request_model.dart';
 import '../models/request/register_request_model.dart';
+import '../models/request/update_profile_request_model.dart';
 import '../source/auth_api_service.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -97,6 +99,31 @@ class AuthRepositoryImpl implements AuthRepository {
           DioException(
             requestOptions: RequestOptions(path: '/auth/me'),
             error: httpResponse.message ?? 'User Profile not found',
+            type: DioExceptionType.badResponse,
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      return DataFailed(e);
+    }
+  }
+
+  @override
+  Future<DataState<UserEntity>> updateProfile(
+    UpdateProfileRequestEntity params,
+  ) async {
+    try {
+      final requestModel = UpdateProfileRequestModel.fromEntity(params);
+      final httpResponse = await _apiService.updateProfile(requestModel);
+
+      if (httpResponse.data != null) {
+        await _localDataSource.saveUser(httpResponse.data!);
+        return DataSuccess(data: httpResponse.data!);
+      } else {
+        return DataFailed(
+          DioException(
+            requestOptions: RequestOptions(path: '/auth/profile'),
+            error: httpResponse.message ?? 'Update profile failed',
             type: DioExceptionType.badResponse,
           ),
         );

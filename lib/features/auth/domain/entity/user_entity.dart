@@ -8,6 +8,8 @@ class UserEntity extends Equatable {
   final String email;
   final String? name;
   final String? phone;
+  final DateTime? emailVerifiedAt;
+  final DateTime? phoneVerifiedAt;
   final String? avatarUrl;
   final bool isVerified;
   final DateTime? createdAt;
@@ -24,6 +26,8 @@ class UserEntity extends Equatable {
     required this.email,
     this.name,
     this.phone,
+    this.emailVerifiedAt,
+    this.phoneVerifiedAt,
     this.avatarUrl,
     required this.isVerified,
     this.createdAt,
@@ -56,6 +60,8 @@ class UserEntity extends Equatable {
     email,
     name,
     phone,
+    emailVerifiedAt,
+    phoneVerifiedAt,
     isVerified,
     createdAt,
     roles,

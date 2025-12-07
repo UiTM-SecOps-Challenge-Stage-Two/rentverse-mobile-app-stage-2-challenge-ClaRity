@@ -15,11 +15,16 @@ import 'package:rentverse/features/auth/domain/usecase/is_logged_in_usecase.dart
 import 'package:rentverse/features/auth/domain/usecase/login_usecase.dart';
 import 'package:rentverse/features/auth/domain/usecase/logout_usecase.dart';
 import 'package:rentverse/features/auth/domain/usecase/register_usecase.dart';
+import 'package:rentverse/features/auth/domain/usecase/update_profile_usecase.dart';
 import 'package:rentverse/features/auth/domain/repository/auth_repository.dart';
 import 'package:rentverse/features/bookings/data/repository/bookings_repository_impl.dart';
 import 'package:rentverse/features/bookings/data/source/booking_api_service.dart';
 import 'package:rentverse/features/bookings/domain/repository/bookings_repository.dart';
 import 'package:rentverse/features/bookings/domain/usecase/create_booking_usecase.dart';
+import 'package:rentverse/features/kyc/data/repository/kyc_repository_impl.dart';
+import 'package:rentverse/features/kyc/data/source/kyc_api_service.dart';
+import 'package:rentverse/features/kyc/domain/repository/kyc_repository.dart';
+import 'package:rentverse/features/kyc/domain/usecase/submit_kyc_usecase.dart';
 import 'package:rentverse/features/rental/data/repository/rental_repository_impl.dart';
 import 'package:rentverse/features/rental/data/source/rental_api_service.dart';
 import 'package:rentverse/features/rental/domain/repository/rental_repository.dart';
@@ -67,6 +72,12 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<BookingsRepository>(
     () => BookingsRepositoryImpl(sl<BookingApiService>()),
   );
+  sl.registerLazySingleton<KycApiService>(
+    () => KycApiServiceImpl(sl<DioClient>()),
+  );
+  sl.registerLazySingleton<KycRepository>(
+    () => KycRepositoryImpl(sl<KycApiService>()),
+  );
   sl.registerLazySingleton<RentalApiService>(
     () => RentalApiServiceImpl(sl<DioClient>()),
   );
@@ -79,6 +90,7 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton(() => IsLoggedInUsecase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => LoginUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => RegisterUsecase(sl<AuthRepository>()));
+  sl.registerLazySingleton(() => UpdateProfileUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => GetUserUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepository>()));
   // Property usecases
@@ -89,6 +101,7 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton(
     () => CreateBookingUseCase(sl<BookingsRepository>()),
   );
+  sl.registerLazySingleton(() => SubmitKycUseCase(sl<KycRepository>()));
   sl.registerLazySingleton(
     () => GetRentReferencesUseCase(sl<RentalRepository>()),
   );
