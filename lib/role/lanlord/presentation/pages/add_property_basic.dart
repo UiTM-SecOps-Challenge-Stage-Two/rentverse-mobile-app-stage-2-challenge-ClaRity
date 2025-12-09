@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rentverse/role/lanlord/presentation/cubit/add_property_cubit.dart';
 import 'package:rentverse/role/lanlord/presentation/cubit/add_property_state.dart';
+import 'package:rentverse/role/lanlord/widget/add_property/map_handling.dart';
+import 'package:rentverse/features/map/presentation/screen/open_map_screen.dart';
 
 class AddPropertyBasicPage extends StatefulWidget {
   const AddPropertyBasicPage({super.key});
@@ -166,16 +168,73 @@ class _AddPropertyBasicPageState extends State<AddPropertyBasicPage> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Container(
-                  height: 160,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey.shade200,
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text('Map preview placeholder'),
+                // Map picker / preview (opens OpenStreetMap for selection)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: state.latitude != null && state.longitude != null
+                      ? MapPreview(
+                          lat: state.latitude!,
+                          lon: state.longitude!,
+                          displayName: state.address.isNotEmpty
+                              ? state.address
+                              : null,
+                          onTap: () async {
+                            final result = await Navigator.of(context)
+                                .push<Map<String, dynamic>>(
+                                  MaterialPageRoute(
+                                    builder: (_) => OpenMapScreen(
+                                      initialLat: state.latitude ?? -6.200000,
+                                      initialLon: state.longitude ?? 106.816666,
+                                    ),
+                                  ),
+                                );
+                            if (result == null) return;
+                            final lat = (result['lat'] as num).toDouble();
+                            final lon = (result['lon'] as num).toDouble();
+                            final displayName =
+                                result['displayName'] as String?;
+                            final city = result['city'] as String?;
+                            final country = result['country'] as String?;
+                            context.read<AddPropertyCubit>().updateBasic(
+                              address: displayName ?? state.address,
+                              city: city ?? state.city,
+                              country: country ?? state.country,
+                              latitude: lat,
+                              longitude: lon,
+                            );
+                            setState(() {
+                              _addressController.text =
+                                  displayName ?? _addressController.text;
+                              _cityController.text =
+                                  city ?? _cityController.text;
+                              _countryController.text =
+                                  country ?? _countryController.text;
+                            });
+                          },
+                        )
+                      : MapPicker(
+                          initialLat: state.latitude ?? -6.200000,
+                          initialLon: state.longitude ?? 106.816666,
+                          onLocationSelected:
+                              (lat, lon, city, country, displayName) {
+                                // update cubit with selected coordinates and address
+                                context.read<AddPropertyCubit>().updateBasic(
+                                  address: displayName ?? state.address,
+                                  city: city ?? state.city,
+                                  country: country ?? state.country,
+                                  latitude: lat,
+                                  longitude: lon,
+                                );
+                                setState(() {
+                                  _addressController.text =
+                                      displayName ?? _addressController.text;
+                                  _cityController.text =
+                                      city ?? _cityController.text;
+                                  _countryController.text =
+                                      country ?? _countryController.text;
+                                });
+                              },
+                        ),
                 ),
                 const SizedBox(height: 12),
                 _LabeledField(

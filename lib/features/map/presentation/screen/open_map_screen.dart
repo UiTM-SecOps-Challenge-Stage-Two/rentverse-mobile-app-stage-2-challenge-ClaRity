@@ -120,6 +120,25 @@ class _OpenMapScreenState extends State<OpenMapScreen> {
                         'Lat: ${location.lat.toStringAsFixed(5)}, Lon: ${location.lon.toStringAsFixed(5)}',
                         style: const TextStyle(color: Colors.grey),
                       ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop({
+                              'lat': location.lat,
+                              'lon': location.lon,
+                              'displayName': location.displayName,
+                              'city': location.city,
+                              'country': location.country,
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1CD8D2),
+                          ),
+                          child: const Text('Select this location'),
+                        ),
+                      ),
                     ],
                   );
                 },
