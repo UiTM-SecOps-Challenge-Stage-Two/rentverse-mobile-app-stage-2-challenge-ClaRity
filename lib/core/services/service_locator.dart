@@ -48,6 +48,7 @@ import 'package:rentverse/features/property/domain/repository/property_repositor
 import 'package:rentverse/features/property/domain/usecase/get_landlord_properties_usecase.dart';
 import 'package:rentverse/features/property/domain/usecase/get_properties_usecase.dart';
 import 'package:rentverse/features/property/domain/usecase/get_property_detail_usecase.dart';
+import 'package:rentverse/features/property/domain/usecase/create_property_usecase.dart';
 import 'package:rentverse/features/chat/data/source/chat_api_service.dart';
 import 'package:rentverse/features/chat/data/source/chat_socket_service.dart';
 import 'package:rentverse/features/chat/data/repository/chat_repository_impl.dart';
@@ -156,6 +157,9 @@ Future<void> setupServiceLocator() async {
   );
   sl.registerLazySingleton(
     () => GetLandlordPropertiesUseCase(sl<PropertyRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => CreatePropertyUseCase(sl<PropertyRepository>()),
   );
   sl.registerLazySingleton(() => StartChatUseCase(sl<ChatRepository>()));
   sl.registerLazySingleton(() => GetConversationsUseCase(sl<ChatRepository>()));
