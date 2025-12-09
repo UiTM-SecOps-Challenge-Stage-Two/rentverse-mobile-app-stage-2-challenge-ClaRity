@@ -36,6 +36,27 @@ class ConversationListCubit extends Cubit<ConversationListState> {
   StreamSubscription<Map<String, dynamic>>? _socketSubscription;
   StreamSubscription<Map<String, dynamic>>? _notificationSubscription;
 
+  void markAsRead(String roomId) {
+    final updated = state.conversations.map((c) {
+      if (c.id == roomId && c.unreadCount > 0) {
+        return ChatConversationEntity(
+          id: c.id,
+          propertyId: c.propertyId,
+          propertyTitle: c.propertyTitle,
+          propertyCity: c.propertyCity,
+          otherUserName: c.otherUserName,
+          otherUserAvatar: c.otherUserAvatar,
+          lastMessage: c.lastMessage,
+          lastMessageAt: c.lastMessageAt,
+          unreadCount: 0,
+        );
+      }
+      return c;
+    }).toList();
+
+    emit(state.copyWith(conversations: updated));
+  }
+
   Future<void> load() async {
     emit(state.copyWith(status: ConversationListStatus.loading, error: null));
     try {

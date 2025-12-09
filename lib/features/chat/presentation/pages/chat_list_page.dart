@@ -159,6 +159,8 @@ class _ChatTile extends StatelessWidget {
             ),
           ),
         );
+        // Mark as read immediately when opening the room
+        context.read<ConversationListCubit>().markAsRead(conversation.id);
       },
       child: Container(
         padding: const EdgeInsets.all(12),
