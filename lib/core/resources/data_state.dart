@@ -1,6 +1,7 @@
 // lib/core/resources/data_state.dart
 
 import 'package:dio/dio.dart';
+import '../utils/error_utils.dart';
 
 abstract class DataState<T> {
   final T? data;
@@ -9,6 +10,10 @@ abstract class DataState<T> {
   final T? links;
 
   const DataState({this.data, this.error, this.paging, this.links});
+
+  /// Helper to resolve backend-friendly error messages.
+  String? get errorMessage =>
+      error != null ? resolveApiErrorMessage(error!, fallback: '') : null;
 }
 
 class DataSuccess<T> extends DataState<T> {

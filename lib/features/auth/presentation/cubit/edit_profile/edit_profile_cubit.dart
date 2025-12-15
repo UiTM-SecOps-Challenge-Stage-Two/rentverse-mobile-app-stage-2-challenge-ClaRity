@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rentverse/core/resources/data_state.dart';
+import 'package:rentverse/core/utils/error_utils.dart';
 import 'package:rentverse/features/auth/domain/entity/update_profile_request_entity.dart';
 import 'package:rentverse/features/auth/domain/entity/user_entity.dart';
 import 'package:rentverse/features/auth/domain/usecase/get_local_user_usecase.dart';
@@ -108,7 +109,10 @@ class EditProfileCubit extends Cubit<EditProfileState> {
       emit(
         state.copyWith(
           isSaving: false,
-          error: result.error?.message ?? 'Update profile failed',
+          error: resolveApiErrorMessage(
+            result.error,
+            fallback: 'Update profile failed',
+          ),
         ),
       );
     } else {

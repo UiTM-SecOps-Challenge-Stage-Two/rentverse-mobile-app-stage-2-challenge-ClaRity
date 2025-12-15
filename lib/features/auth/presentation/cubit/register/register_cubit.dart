@@ -2,6 +2,7 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rentverse/core/resources/data_state.dart';
+import 'package:rentverse/core/utils/error_utils.dart';
 import 'package:rentverse/features/auth/domain/entity/register_request_enity.dart';
 import 'package:rentverse/features/auth/domain/usecase/register_usecase.dart';
 
@@ -108,10 +109,10 @@ class RegisterCubit extends Cubit<RegisterState> {
     if (result is DataSuccess) {
       emit(state.copyWith(status: RegisterStatus.success));
     } else if (result is DataFailed) {
-      final errorMsg =
-          result.error?.message ??
-          result.error?.response?.data['message'] ??
-          "Registration Failed";
+      final errorMsg = resolveApiErrorMessage(
+        result.error,
+        fallback: 'Registration Failed',
+      );
 
       emit(
         state.copyWith(status: RegisterStatus.failure, errorMessage: errorMsg),

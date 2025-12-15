@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rentverse/core/resources/data_state.dart';
+import 'package:rentverse/core/utils/error_utils.dart';
 import 'package:rentverse/core/services/service_locator.dart';
 import 'package:rentverse/features/review/domain/usecase/submit_review_usecase.dart';
 import 'package:rentverse/features/review/presentation/widget/property_reviews_widget.dart';
@@ -105,7 +106,7 @@ class _ReviewBottomSheetContentState extends State<_ReviewBottomSheetContent> {
       } else if (result is DataFailed) {
         final dioErr = result.error;
         final statusCode = dioErr?.response?.statusCode;
-        final msg = dioErr?.message ?? 'Unknown error';
+        final msg = resolveApiErrorMessage(dioErr, fallback: 'Unknown error');
 
         // If backend returns 409, show specific message in Indonesian
         if (statusCode == 409) {

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rentverse/core/resources/data_state.dart';
+import 'package:rentverse/core/utils/error_utils.dart';
 import 'package:rentverse/features/kyc/domain/entity/submit_kyc_params.dart';
 import 'package:rentverse/features/kyc/domain/usecase/submit_kyc_usecase.dart';
 import 'verify_ikyc_state.dart';
@@ -71,7 +72,10 @@ class VerifyIKycCubit extends Cubit<VerifyIKycState> {
       emit(
         state.copyWith(
           isSubmitting: false,
-          error: result.error?.message ?? 'Gagal mengirim KYC',
+          error: resolveApiErrorMessage(
+            result.error,
+            fallback: 'Gagal mengirim KYC',
+          ),
         ),
       );
     } else {

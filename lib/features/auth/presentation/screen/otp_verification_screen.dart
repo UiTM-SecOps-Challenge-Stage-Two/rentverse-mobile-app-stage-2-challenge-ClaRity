@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rentverse/common/colors/custom_color.dart';
 import 'package:rentverse/core/services/service_locator.dart';
+import 'package:rentverse/core/utils/error_utils.dart';
 import 'package:rentverse/features/auth/domain/usecase/send_otp_usecase.dart';
 import 'package:rentverse/features/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:rentverse/core/resources/data_state.dart';
-import 'package:dio/dio.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final String target;
@@ -40,22 +40,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           context,
         ).showSnackBar(const SnackBar(content: Text('OTP sent successfully')));
       } else if (result is DataFailed) {
-        // Try to extract server message from DioException
-        String msg = 'Failed to send OTP';
-        final err = result.error;
-        if (err is DioException) {
-          final resp = err.response;
-          if (resp != null && resp.data != null) {
-            final d = resp.data;
-            if (d is Map && d['message'] != null)
-              msg = d['message'].toString();
-            else
-              msg = resp.statusMessage ?? err.message ?? msg;
-          } else {
-            msg = err.message ?? msg;
-          }
-        }
-
+        final msg = resolveApiErrorMessage(
+          result.error,
+          fallback: 'Failed to send OTP',
+        );
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(msg)));
@@ -96,21 +84,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         );
         Navigator.of(context).pop(true);
       } else if (result is DataFailed) {
-        String msg = 'Verification failed';
-        final err = result.error;
-        if (err is DioException) {
-          final resp = err.response;
-          if (resp != null && resp.data != null) {
-            final d = resp.data;
-            if (d is Map && d['message'] != null)
-              msg = d['message'].toString();
-            else
-              msg = resp.statusMessage ?? err.message ?? msg;
-          } else {
-            msg = err.message ?? msg;
-          }
-        }
-
+        final msg = resolveApiErrorMessage(
+          result.error,
+          fallback: 'Verification failed',
+        );
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(msg)));

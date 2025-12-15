@@ -85,20 +85,30 @@ class _ImageTileState extends State<ImageTile> {
 
   Widget _networkImage(String url) {
     if (url.isEmpty) {
-      return _fallbackBox();
+      return _fallbackBox('No image available');
     }
     final processed = makeDeviceAccessibleUrl(url) ?? url;
     return CachedNetworkImage(
       imageUrl: processed,
       fit: BoxFit.cover,
       placeholder: (_, __) => Container(color: Colors.grey.shade200),
-      errorWidget: (_, __, ___) => _fallbackBox(),
+      errorWidget: (_, __, ___) => _fallbackBox('Failed to load image'),
     );
   }
 
-  Widget _fallbackBox() => Container(
+  Widget _fallbackBox(String message) => Container(
     color: Colors.grey.shade200,
-    child: const Icon(Icons.image_not_supported, color: Colors.grey),
+    child: Center(
+      child: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Colors.grey,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
   );
 
   Widget _emptyState() => Container(

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rentverse/common/utils/network_utils.dart';
 import 'package:rentverse/features/property/domain/entity/list_property_entity.dart';
 import 'package:rentverse/role/tenant/presentation/cubit/list_property/cubit.dart';
 import 'package:rentverse/role/tenant/presentation/cubit/list_property/state.dart';
@@ -152,19 +153,15 @@ Widget _buildPropertyItem(BuildContext context, PropertyEntity property) {
                 height: 86,
                 child: imageUrl != null && imageUrl.isNotEmpty
                     ? CachedNetworkImage(
-                        imageUrl: imageUrl,
+                        imageUrl: makeDeviceAccessibleUrl(imageUrl) ?? imageUrl,
                         fit: BoxFit.cover,
                         placeholder: (c, _) =>
                             Container(color: Colors.grey.shade200),
-                        errorWidget: (c, _, __) => Container(
-                          color: Colors.grey.shade300,
-                          child: const Icon(Icons.image_not_supported),
+                        errorWidget: (c, _, __) => const _ImageUnavailableBox(
+                          message: 'Failed to load image',
                         ),
                       )
-                    : Container(
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.home, color: Colors.grey),
-                      ),
+                    : const _ImageUnavailableBox(message: 'No image available'),
               ),
             ),
             const SizedBox(width: 12),
@@ -240,4 +237,28 @@ Widget _buildPropertyItem(BuildContext context, PropertyEntity property) {
       ),
     ),
   );
+}
+
+class _ImageUnavailableBox extends StatelessWidget {
+  const _ImageUnavailableBox({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey.shade200,
+      child: Center(
+        child: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
 }

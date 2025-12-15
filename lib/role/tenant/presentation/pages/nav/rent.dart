@@ -9,6 +9,7 @@ import 'package:rentverse/features/bookings/domain/entity/res/booking_response_e
 import 'package:rentverse/features/midtrans/domain/usecase/pay_invoice_usecase.dart';
 import 'package:rentverse/features/review/domain/usecase/submit_review_usecase.dart';
 import 'package:rentverse/core/resources/data_state.dart';
+import 'package:rentverse/core/utils/error_utils.dart';
 import 'package:rentverse/role/tenant/presentation/pages/rent/midtrans_payment_page.dart';
 import 'package:rentverse/role/tenant/presentation/pages/rent/detail_active_rent.dart';
 import 'package:rentverse/role/tenant/presentation/cubit/rent/cubit.dart';
@@ -116,7 +117,7 @@ class _TenantRentPageState extends State<TenantRentPage> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Failed to submit review: ${result.error}',
+                          'Failed to submit review: ${resolveApiErrorMessage(result.error)}',
                         ),
                       ),
                     );
