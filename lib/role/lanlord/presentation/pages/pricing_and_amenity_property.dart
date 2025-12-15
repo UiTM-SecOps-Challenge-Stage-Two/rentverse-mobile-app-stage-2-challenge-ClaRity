@@ -17,7 +17,7 @@ class _PricingAndAmenityPropertyPageState
   late List<String> _features;
   late List<String> _facilities;
   late List<String> _views;
-  late int _billingPeriodId;
+  late List<int> _billingPeriodIds;
   late int _listingTypeId;
   late TextEditingController _priceController;
 
@@ -49,9 +49,8 @@ class _PricingAndAmenityPropertyPageState
     _features = List<String>.from(state.features);
     _facilities = List<String>.from(state.facilities);
     _views = List<String>.from(state.views);
-    _billingPeriodId = state.billingPeriodIds.isNotEmpty
-        ? state.billingPeriodIds.first
-        : 1;
+    _billingPeriodIds = List<int>.from(state.billingPeriodIds);
+    if (_billingPeriodIds.isEmpty) _billingPeriodIds.add(1);
     _listingTypeId = state.listingTypeId;
     _priceController = TextEditingController(text: state.price);
   }
@@ -163,17 +162,26 @@ class _PricingAndAmenityPropertyPageState
                   style: TextStyle(fontWeight: FontWeight.w700),
                 ),
                 ..._billingOptions.map(
-                  (opt) => RadioListTile<int>(
-                    value: opt['id'] as int,
-                    groupValue: _billingPeriodId,
-                    onChanged: (val) {
-                      if (val == null) return;
-                      setState(() => _billingPeriodId = val);
-                      _pushChanges();
-                    },
-                    title: Text(opt['label'] as String),
-                    dense: true,
-                  ),
+                  (opt) {
+                    final id = opt['id'] as int;
+                    final isSelected = _billingPeriodIds.contains(id);
+                    return CheckboxListTile(
+                      value: isSelected,
+                      onChanged: (val) {
+                        setState(() {
+                          if (val == true) {
+                            _billingPeriodIds.add(id);
+                          } else {
+                            _billingPeriodIds.remove(id);
+                          }
+                        });
+                        _pushChanges();
+                      },
+                      title: Text(opt['label'] as String),
+                      dense: true,
+                      controlAffinity: ListTileControlAffinity.leading,
+                    );
+                  },
                 ),
                 const SizedBox(height: 12),
                 const Text(
@@ -232,7 +240,7 @@ class _PricingAndAmenityPropertyPageState
       features: _features,
       facilities: _facilities,
       views: _views,
-      billingPeriodIds: [_billingPeriodId],
+      billingPeriodIds: _billingPeriodIds,
       price: _priceController.text,
       listingTypeId: _listingTypeId,
     );
@@ -246,9 +254,8 @@ class _PricingAndAmenityPropertyPageState
       _features = List<String>.from(state.features);
       _facilities = List<String>.from(state.facilities);
       _views = List<String>.from(state.views);
-      _billingPeriodId = state.billingPeriodIds.isNotEmpty
-          ? state.billingPeriodIds.first
-          : 1;
+      _billingPeriodIds = List<int>.from(state.billingPeriodIds);
+      if (_billingPeriodIds.isEmpty) _billingPeriodIds.add(1);
       _listingTypeId = state.listingTypeId;
       _priceController.text = state.price;
     });

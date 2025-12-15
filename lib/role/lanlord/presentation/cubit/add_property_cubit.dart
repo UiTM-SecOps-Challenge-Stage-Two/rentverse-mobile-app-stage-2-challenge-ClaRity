@@ -157,7 +157,7 @@ class AddPropertyCubit extends Cubit<AddPropertyState> {
   }
 
   bool _isBasicComplete(AddPropertyState value) {
-    return value.title.isNotEmpty &&
+    return value.title.length >= 5 &&
         value.propertyTypeId > 0 &&
         value.listingTypeId > 0 &&
         value.address.isNotEmpty &&
