@@ -267,19 +267,61 @@ class _AddPropertyBasicPageState extends State<AddPropertyBasicPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: _reset,
-                        child: const Text('Reset'),
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          gradient: customLinearGradient,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Container(
+                          margin: const EdgeInsets.all(2), // Border width
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10), // 12 - 2
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _reset,
+                              borderRadius: BorderRadius.circular(10),
+                              child: const Center(
+                                child: Text(
+                                  'Reset',
+                                  style: TextStyle(
+                                    color: appSecondaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: _save,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: appPrimaryColor,
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          gradient: customLinearGradient,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text('Save'),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _save,
+                            borderRadius: BorderRadius.circular(12),
+                            child: const Center(
+                              child: Text(
+                                'Save',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -567,16 +609,43 @@ class _ImagePickerRow extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: images.map((e) => Chip(label: Text(_fileName(e)))).toList(),
-        ),
-        const SizedBox(height: 8),
-        OutlinedButton.icon(
-          onPressed: onPick,
-          icon: const Icon(Icons.upload_file),
-          label: const Text('Select Images'),
+        if (images.isNotEmpty) ...[
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: images.map((e) => Chip(label: Text(_fileName(e)))).toList(),
+          ),
+          const SizedBox(height: 12),
+        ],
+        Container(
+          width: double.infinity,
+          height: 50,
+          decoration: BoxDecoration(
+            gradient: customLinearGradient,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onPick,
+              borderRadius: BorderRadius.circular(12),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.upload_file, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    'Select Images',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ],
     );
