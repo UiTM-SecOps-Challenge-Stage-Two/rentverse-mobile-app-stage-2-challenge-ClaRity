@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rentverse/role/lanlord/presentation/cubit/property/cubit.dart';
 import 'package:rentverse/role/lanlord/presentation/cubit/property/state.dart';
 import 'package:rentverse/role/lanlord/widget/my_property/property_components.dart';
+import 'package:rentverse/role/lanlord/widget/my_property/property_skeleton.dart';
 
 class ListingTab extends StatelessWidget {
   const ListingTab({super.key});
@@ -16,6 +17,10 @@ class ListingTab extends StatelessWidget {
         }
 
         if (state.status == LandlordPropertyStatus.failure) {
+          // Show skeleton for 401 status
+          if (state.statusCode == 401) {
+            return const PropertySkeletonView();
+          }
           return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,

@@ -12,6 +12,7 @@ import 'package:rentverse/features/chat/domain/entity/chat_conversation_entity.d
 import 'package:rentverse/features/chat/presentation/cubit/conversation_list/conversation_list_cubit.dart';
 import 'package:rentverse/features/chat/presentation/cubit/conversation_list/conversation_list_state.dart';
 import 'package:rentverse/features/chat/presentation/pages/chat_room_page.dart';
+import 'package:rentverse/features/chat/presentation/widgets/chat_skeleton.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 enum ChatFilter { all, unread, read }
@@ -53,6 +54,10 @@ class _ChatListPageState extends State<ChatListPage> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (state.status == ConversationListStatus.failure) {
+                // Show skeleton for 401 status
+                if (state.statusCode == 401) {
+                  return const ChatSkeletonView();
+                }
                 return Center(
                     child: Text(state.error ?? 'Failed to load chats'));
               }
@@ -102,7 +107,6 @@ class _ChatListPageState extends State<ChatListPage> {
           c.otherUserName.toLowerCase().contains(query) ||
           c.propertyTitle.toLowerCase().contains(query) ||
           c.lastMessage.toLowerCase().contains(query);
-
 
       final hasUnread = c.unreadCount > 0;
 

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rentverse/role/lanlord/presentation/cubit/property/cubit.dart';
 import 'package:rentverse/role/lanlord/presentation/cubit/property/state.dart';
 import 'package:rentverse/role/lanlord/widget/my_property/property_components.dart';
+import 'package:rentverse/role/lanlord/widget/my_property/property_skeleton.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 class SubmissionTab extends StatelessWidget {
@@ -17,6 +18,10 @@ class SubmissionTab extends StatelessWidget {
         }
 
         if (state.status == LandlordPropertyStatus.failure) {
+          // Show skeleton for 401 status
+          if (state.statusCode == 401) {
+            return const PropertySkeletonView();
+          }
           return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -36,9 +41,8 @@ class SubmissionTab extends StatelessWidget {
           return const EmptyState(message: 'No submissions yet');
         }
 
-        final submissions = state.items
-            .where((item) => !item.isVerified)
-            .toList();
+        final submissions =
+            state.items.where((item) => !item.isVerified).toList();
 
         if (submissions.isEmpty) {
           return const EmptyState(message: 'No submissions yet');

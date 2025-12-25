@@ -7,22 +7,25 @@ import 'package:rentverse/role/lanlord/presentation/cubit/booking_request/cubit.
 import 'package:rentverse/role/lanlord/presentation/cubit/booking_request/state.dart';
 import 'package:rentverse/role/lanlord/widget/my_property/property_components.dart';
 import 'package:rentverse/role/lanlord/presentation/pages/booking_detail.dart';
+import 'package:rentverse/role/lanlord/widget/booking/booking_skeleton.dart';
 
 class ConfirmedTab extends StatelessWidget {
   const ConfirmedTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<
-      LandlordBookingRequestCubit,
-      LandlordBookingRequestState
-    >(
+    return BlocBuilder<LandlordBookingRequestCubit,
+        LandlordBookingRequestState>(
       builder: (context, state) {
         if (state.status == LandlordBookingRequestStatus.loading) {
           return const Center(child: CircularProgressIndicator());
         }
 
         if (state.status == LandlordBookingRequestStatus.failure) {
+          // Show skeleton for 401 status
+          if (state.statusCode == 401) {
+            return const BookingSkeletonView();
+          }
           return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -167,9 +170,8 @@ class _PlaceholderBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initial = title.isNotEmpty
-        ? title.characters.first.toUpperCase()
-        : '-';
+    final initial =
+        title.isNotEmpty ? title.characters.first.toUpperCase() : '-';
     return Container(
       width: 90,
       height: 80,

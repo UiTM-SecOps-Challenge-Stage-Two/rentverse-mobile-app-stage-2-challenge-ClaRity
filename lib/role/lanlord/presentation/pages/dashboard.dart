@@ -5,6 +5,7 @@ import 'package:rentverse/role/lanlord/widget/dashboard/property_being_proposed.
 import 'package:rentverse/role/lanlord/widget/dashboard/rented_property.dart';
 import 'package:rentverse/role/lanlord/widget/dashboard/stats_widget.dart';
 import 'package:rentverse/role/lanlord/widget/dashboard/your_trust_index.dart';
+import 'package:rentverse/role/lanlord/widget/dashboard/dashboard_skeleton.dart';
 import 'package:rentverse/core/services/service_locator.dart';
 import 'package:rentverse/role/lanlord/domain/entity/dashboard_entity_response.dart';
 import 'package:rentverse/role/lanlord/domain/usecase/get_landlord_dashboard_usecase.dart';
@@ -80,6 +81,10 @@ class _LandlordDashboardView extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.status == LandlordDashboardStatus.failure) {
+      // Show skeleton for 401 status
+      if (state.statusCode == 401) {
+        return const DashboardSkeletonView();
+      }
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -101,7 +106,6 @@ class _LandlordDashboardView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           _DashboardWalletCard(totalIncome: overview?.totalIncome),
           const SizedBox(height: 16),
           StatsWidget(
@@ -123,11 +127,9 @@ class _LandlordDashboardView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-
           YourTrustIndex(score: (overview?.trust.score ?? 0).toDouble()),
           const SizedBox(height: 16),
           const SizedBox(height: 16),
-
           BlocBuilder<LandlordPropertyCubit, LandlordPropertyState>(
             builder: (context, propsState) {
               if (propsState.status == LandlordPropertyStatus.loading) {
@@ -160,7 +162,6 @@ class _LandlordDashboardView extends StatelessWidget {
             },
           ),
           const SizedBox(height: 16),
-
           BlocBuilder<LandlordPropertyCubit, LandlordPropertyState>(
             builder: (context, propsState) {
               if (propsState.status == LandlordPropertyStatus.loading) {

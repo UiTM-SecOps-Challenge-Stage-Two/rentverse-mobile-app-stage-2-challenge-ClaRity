@@ -28,97 +28,128 @@ class _ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProfileCubit, ProfileState>(builder: (context, state) {
-      if (state.status == ProfileStatus.loading) {
-        return const Center(child: CircularProgressIndicator());
-      }
-      if (state.status == ProfileStatus.failure) {
-        return Center(child: Text(state.errorMessage ?? 'Error'));
-      }
-      final user = state.user;
-      if (user == null) {
-        return const Center(child: Text('No user data'));
-      }
+    return BlocConsumer<ProfileCubit, ProfileState>(
+      listener: (context, state) {
+        if (state.status == ProfileStatus.failure && state.statusCode == 401) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: const Text('Opss, ada yang janggal!'),
+              content: const Text(
+                  'Akses ditolak. Terdapat sesuatu yang tidak betul dalam sistem. '
+                  'Status ini bukan penamat, tetapi satu petunjuk.'
+                  'Periksa logiknya, telusuri kelemahannya, dan perbaiki '
+                  'sehingga status ini tidak lagi muncul.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        if (state.status == ProfileStatus.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (state.status == ProfileStatus.failure) {
+          // Show skeleton for 401 status
+          if (state.statusCode == 401) {
+            return const _ProfileSkeletonView();
+          }
+          return Center(child: Text(state.errorMessage ?? 'Error'));
+        }
+        final user = state.user;
+        if (user == null) {
+          return const Center(child: Text('No user data'));
+        }
 
-      final displayName = user.name?.isNotEmpty == true ? user.name! : 'User';
-      final roleLabel =
-          user.roles?.map((r) => r.role?.name).whereType<String>().join(', ') ??
-              '';
+        final displayName = user.name?.isNotEmpty == true ? user.name! : 'User';
+        final roleLabel = user.roles
+                ?.map((r) => r.role?.name)
+                .whereType<String>()
+                .join(', ') ??
+            '';
 
-      return SafeArea(
-          child: Stack(children: [
-        Container(color: Colors.white),
+        return SafeArea(
+            child: Stack(children: [
+          Container(color: Colors.white),
+          SizedBox(
+              height: 260,
+              width: double.infinity,
+              child: const _HeaderBackground()),
+          RefreshIndicator(
+            onRefresh: () async {
+              await context.read<ProfileCubit>().loadProfile();
+            },
+            child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 140, 16, 24),
+                child: Column(children: [
+                  _ProfileHeader(
+                      name: displayName,
+                      role: roleLabel,
+                      avatarUrl: user.avatarUrl,
+                      isVerified: user.isVerified),
+                  const SizedBox(height: 20),
+                  _ProfileMenuCard(items: [
+                    _ProfileMenuItem(
+                        icon: LucideIcons.edit,
+                        label: 'Edit Profile',
+                        badgeCount: 3,
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => const EditProfileScreen()));
+                        }),
+                    _ProfileMenuItem(
+                        icon: LucideIcons.star,
+                        label: 'Trust Index',
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => const TrustIndexPage()));
+                        }),
+                    _ProfileMenuItem(
+                        icon: LucideIcons.fileText,
+                        label: 'Disputes',
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => const MyDisputesPage()));
+                        }),
+                    _ProfileMenuItem(
+                        icon: LucideIcons.wallet,
+                        label: 'My Wallet',
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => const MyWalletPage()));
+                        })
+                  ]),
+                  const SizedBox(height: 12),
+                  _ProfileMenuCard(items: [
+                    const _ProfileMenuItem(
+                        icon: LucideIcons.bell, label: 'Notifications'),
+                    const _ProfileMenuItem(
+                        icon: LucideIcons.lock, label: 'Security'),
+                    const _ProfileMenuItem(
+                        icon: LucideIcons.globe, label: 'Language'),
+                    _ProfileMenuItem(
+                        icon: LucideIcons.logOut,
+                        label: 'Logout',
+                        iconColor: Colors.red,
+                        valueColor: Colors.red,
+                        onTap: () async {
+                          await sl<LogoutUseCase>()();
 
-
-        SizedBox(
-            height: 260,
-            width: double.infinity,
-            child: const _HeaderBackground()),
-
-
-        SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 140, 16, 24),
-            child: Column(children: [
-              _ProfileHeader(
-                  name: displayName,
-                  role: roleLabel,
-                  avatarUrl: user.avatarUrl,
-                  isVerified: user.isVerified),
-              const SizedBox(height: 20),
-              _ProfileMenuCard(items: [
-                _ProfileMenuItem(
-                    icon: LucideIcons.edit,
-                    label: 'Edit Profile',
-                    badgeCount: 3,
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => const EditProfileScreen()));
-                    }),
-                _ProfileMenuItem(
-                    icon: LucideIcons.star,
-                    label: 'Trust Index',
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => const TrustIndexPage()));
-                    }),
-                _ProfileMenuItem(
-                    icon: LucideIcons.fileText,
-                    label: 'Disputes',
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => const MyDisputesPage()));
-                    }),
-                _ProfileMenuItem(
-                    icon: LucideIcons.wallet,
-                    label: 'My Wallet',
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => const MyWalletPage()));
-                    })
-              ]),
-              const SizedBox(height: 12),
-              _ProfileMenuCard(items: [
-                const _ProfileMenuItem(
-                    icon: LucideIcons.bell, label: 'Notifications'),
-                const _ProfileMenuItem(
-                    icon: LucideIcons.lock, label: 'Security'),
-                const _ProfileMenuItem(
-                    icon: LucideIcons.globe, label: 'Language'),
-                _ProfileMenuItem(
-                    icon: LucideIcons.logOut,
-                    label: 'Logout',
-                    iconColor: Colors.red,
-                    valueColor: Colors.red,
-                    onTap: () async {
-                      await sl<LogoutUseCase>()();
-
-
-                      context.read<AuthCubit>().checkAuthStatus();
-                    })
-              ])
-            ]))
-      ]));
-    });
+                          context.read<AuthCubit>().checkAuthStatus();
+                        })
+                  ])
+                ])),
+          )
+        ]));
+      },
+    );
   }
 }
 
@@ -167,7 +198,6 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(alignment: Alignment.bottomCenter, children: [
       Column(children: [
-
         Stack(children: [
           CircleAvatar(
               radius: 48,
@@ -198,16 +228,11 @@ class _ProfileHeader extends StatelessWidget {
           Text(role,
               style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
         const SizedBox(height: 6),
-
-
         Row(mainAxisSize: MainAxisSize.min, children: [
-
           GestureDetector(
               onTap: () async {
-
                 await Navigator.of(context).push(MaterialPageRoute(
                     builder: (_) => const EditProfileScreen()));
-
 
                 if (context.mounted) {
                   final cubit = context.read<ProfileCubit>();
@@ -220,16 +245,12 @@ class _ProfileHeader extends StatelessWidget {
                       color: Colors.white, shape: BoxShape.circle),
                   child: Icon(LucideIcons.edit,
                       size: 14, color: appSecondaryColor))),
-
           const SizedBox(width: 8),
-
           Icon(isVerified ? LucideIcons.badgeCheck : LucideIcons.alertCircle,
               size: 14,
               color:
                   isVerified ? Colors.green.shade600 : Colors.orange.shade700),
           const SizedBox(width: 6),
-
-
           Text(isVerified ? 'Verified' : 'Not verified',
               style: TextStyle(
                   fontSize: 12,
@@ -306,5 +327,152 @@ class _ProfileMenuTile extends StatelessWidget {
           Icon(LucideIcons.chevronRight, color: Colors.grey)
         ]),
         onTap: item.onTap);
+  }
+}
+
+class _ProfileSkeletonView extends StatelessWidget {
+  const _ProfileSkeletonView();
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Stack(
+        children: [
+          Container(color: Colors.white),
+          // Header background
+          SizedBox(
+            height: 260,
+            width: double.infinity,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.grey.shade300,
+                    Colors.grey.shade200,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Content
+          RefreshIndicator(
+            onRefresh: () async {
+              await context.read<ProfileCubit>().loadProfile();
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 140, 16, 24),
+              child: Column(
+                children: [
+                  // Avatar skeleton
+                  Column(
+                    children: [
+                      Container(
+                        width: 96,
+                        height: 96,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: 120,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: 80,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: 100,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Menu card skeleton 1
+                  _buildSkeletonCard(4),
+                  const SizedBox(height: 12),
+                  // Menu card skeleton 2
+                  _buildSkeletonCard(4),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonCard(int itemCount) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          for (int i = 0; i < itemCount; i++) ...[
+            _buildSkeletonMenuItem(),
+            if (i != itemCount - 1)
+              Divider(height: 1, color: Colors.grey.shade200),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonMenuItem() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Container(
+              height: 16,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

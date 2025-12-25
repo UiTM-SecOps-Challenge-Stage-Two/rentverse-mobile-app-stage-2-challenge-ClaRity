@@ -10,12 +10,14 @@ class LandlordDashboardState {
   final DashboardResponseEntity? dashboard;
   final UserEntity? user;
   final String? errorMessage;
+  final int? statusCode;
 
   const LandlordDashboardState({
     this.status = LandlordDashboardStatus.initial,
     this.dashboard,
     this.user,
     this.errorMessage,
+    this.statusCode,
   });
 
   LandlordDashboardState copyWith({
@@ -23,12 +25,14 @@ class LandlordDashboardState {
     DashboardResponseEntity? dashboard,
     UserEntity? user,
     String? errorMessage,
+    int? statusCode,
   }) {
     return LandlordDashboardState(
       status: status ?? this.status,
       dashboard: dashboard ?? this.dashboard,
       user: user ?? this.user,
       errorMessage: errorMessage ?? this.errorMessage,
+      statusCode: statusCode ?? this.statusCode,
     );
   }
 }

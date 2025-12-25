@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rentverse/features/auth/domain/usecase/get_local_user_usecase.dart';
 import 'package:rentverse/role/lanlord/domain/usecase/get_landlord_dashboard_usecase.dart';
@@ -8,7 +9,7 @@ class LandlordDashboardCubit extends Cubit<LandlordDashboardState> {
   final GetLandlordDashboardUseCase _getDashboard;
 
   LandlordDashboardCubit(this._getLocalUser, this._getDashboard)
-    : super(const LandlordDashboardState());
+      : super(const LandlordDashboardState());
 
   Future<void> load() async {
     emit(
@@ -28,10 +29,20 @@ class LandlordDashboardCubit extends Cubit<LandlordDashboardState> {
         ),
       );
     } catch (e) {
+      int? statusCode;
+      String errorMessage = e.toString();
+
+      if (e is DioException) {
+        statusCode = e.response?.statusCode;
+        errorMessage =
+            e.response?.data?['message'] ?? e.message ?? e.toString();
+      }
+
       emit(
         state.copyWith(
           status: LandlordDashboardStatus.failure,
-          errorMessage: e.toString(),
+          errorMessage: errorMessage,
+          statusCode: statusCode,
         ),
       );
     }

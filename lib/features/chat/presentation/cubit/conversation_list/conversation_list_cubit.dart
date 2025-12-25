@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 
@@ -14,7 +15,6 @@ class ConversationListCubit extends Cubit<ConversationListState> {
     this._socketService,
     this._notificationService,
   ) : super(const ConversationListState()) {
-
     try {
       _socketService.connect();
     } catch (_) {}
@@ -22,7 +22,6 @@ class ConversationListCubit extends Cubit<ConversationListState> {
     _socketSubscription = _socketService.messageStream.listen((raw) {
       _handleIncoming(raw);
     });
-
 
     _notificationSubscription = _notificationService.chatMessageStream.listen(
       (data) => _handleIncoming(data),
@@ -69,10 +68,20 @@ class ConversationListCubit extends Cubit<ConversationListState> {
         ),
       );
     } catch (e) {
+      int? statusCode;
+      String errorMessage = e.toString();
+
+      if (e is DioException) {
+        statusCode = e.response?.statusCode;
+        errorMessage =
+            e.response?.data?['message'] ?? e.message ?? e.toString();
+      }
+
       emit(
         state.copyWith(
           status: ConversationListStatus.failure,
-          error: e.toString(),
+          error: errorMessage,
+          statusCode: statusCode,
         ),
       );
     }
@@ -112,13 +121,9 @@ class ConversationListCubit extends Cubit<ConversationListState> {
       }).toList();
 
       if (updated) {
-
         updatedList.sort((a, b) => b.lastMessageAt.compareTo(a.lastMessageAt));
         emit(state.copyWith(conversations: updatedList));
       } else {
-
-
-
         unawaited(load());
       }
     } catch (_) {}

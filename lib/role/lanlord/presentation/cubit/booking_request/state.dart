@@ -13,6 +13,7 @@ class LandlordBookingRequestState extends Equatable {
   final bool isActionLoading;
   final String? actionBookingId;
   final String? error;
+  final int? statusCode;
 
   const LandlordBookingRequestState({
     this.status = LandlordBookingRequestStatus.initial,
@@ -24,6 +25,7 @@ class LandlordBookingRequestState extends Equatable {
     this.isActionLoading = false,
     this.actionBookingId,
     this.error,
+    this.statusCode,
   });
 
   LandlordBookingRequestState copyWith({
@@ -36,6 +38,7 @@ class LandlordBookingRequestState extends Equatable {
     bool? isActionLoading,
     String? actionBookingId,
     String? error,
+    int? statusCode,
   }) {
     return LandlordBookingRequestState(
       status: status ?? this.status,
@@ -47,19 +50,21 @@ class LandlordBookingRequestState extends Equatable {
       isActionLoading: isActionLoading ?? this.isActionLoading,
       actionBookingId: actionBookingId ?? this.actionBookingId,
       error: error,
+      statusCode: statusCode ?? this.statusCode,
     );
   }
 
   @override
   List<Object?> get props => [
-    status,
-    requests,
-    pendingPayments,
-    paidPayments,
-    confirmed,
-    rejected,
-    isActionLoading,
-    actionBookingId,
-    error,
-  ];
+        status,
+        requests,
+        pendingPayments,
+        paidPayments,
+        confirmed,
+        rejected,
+        isActionLoading,
+        actionBookingId,
+        error,
+        statusCode,
+      ];
 }
